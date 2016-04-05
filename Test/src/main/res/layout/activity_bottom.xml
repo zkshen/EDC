@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="105dp"
     android:background="@color/darkgrey" >
 
     <LinearLayout
@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
+        android:layout_marginTop="10dp"
         android:orientation="vertical" >
 
         <ImageView
@@ -25,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="实时数据"
+            android:textSize="18dp"
             android:textColor="@color/green"
             android:textStyle="bold" />
         </LinearLayout>
@@ -35,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
+        android:layout_marginTop="10dp"
         android:orientation="vertical" >
 
         <ImageView
@@ -49,6 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="家电控制"
+            android:textSize="18dp"
             android:textColor="@color/lightgrey"
             android:textStyle="bold" />
     </LinearLayout>
@@ -59,6 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
+        android:layout_marginTop="10dp"
         android:orientation="vertical" >
 
         <ImageView
@@ -72,6 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:textSize="18dp"
             android:text="系统设置"
             android:textColor="@color/lightgrey"
             android:textStyle="bold" />

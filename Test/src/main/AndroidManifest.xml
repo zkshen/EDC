@@ -9,6 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
+            <!-- 这一段intent内容表示该app从这个activity启动 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -16,5 +17,6 @@
             </intent-filter>
         </activity>
     </application>
-
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 </manifest>
