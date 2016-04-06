@@ -15,6 +15,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -22,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener,OnPageChangeListener{
     // 底部菜单3个Linearlayout
@@ -44,6 +46,10 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
 
     private ImageView ble_start;
 
+    private BluetoothAdapter mBluetoothAdapter = null;
+    private BluetoothDevice mBluetoothDevice = null;
+    private static final int REQUEST_ENABLE_BT = 2;
+    private static final int REQUEST_SELECT_DEVICE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +58,10 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         initView();
         // 初始化底部按钮事件
         initEvent();
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, "找不到蓝牙适配器", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void initEvent() {
@@ -113,25 +123,35 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 viewPager.setCurrentItem(2);
                 break;
             case R.id.ble_start:
-                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-                if(adapter != null){
-                    System.out.println("本机拥有蓝牙设备");
-                    // 如果蓝牙未开启，则请求开启蓝牙
-                    if(!adapter.isEnabled()){
-                        Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        startActivity(intent);
-                    }
-                    Set<BluetoothDevice> devices = adapter.getBondedDevices();
-                    if(devices.size() > 0){
-                        for(Iterator iterator = devices.iterator();iterator
-                                .hasNext();){
-                            BluetoothDevice bluetoothDevice = (BluetoothDevice) iterator.next();
-                            System.out.println(bluetoothDevice.getAddress());
-                        }
-                    }
+//                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+//                if(adapter != null){
+//                    Toast.makeText(this, "已找到蓝牙适配器", Toast.LENGTH_SHORT).show();
+//                    // 如果蓝牙未开启，则请求开启蓝牙
+//                    if(!adapter.isEnabled()){
+//                        Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//                        startActivity(intent);
+//                    }
+//                    Set<BluetoothDevice> devices = adapter.getBondedDevices();
+//                    if(devices.size() > 0){
+//                        for(Iterator iterator = devices.iterator();iterator
+//                                .hasNext();){
+//                            BluetoothDevice bluetoothDevice = (BluetoothDevice) iterator.next();
+//                            System.out.println(bluetoothDevice.getAddress());
+//                        }
+//                    }
+//                }
+//                else{
+//                    Toast.makeText(this, "找不到蓝牙适配器", Toast.LENGTH_SHORT).show();
+//                }
+                if (!mBluetoothAdapter.isEnabled()) {
+                    System.out.println("蓝牙未开启");
+                    Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
                 }
-                else{
-                    System.out.println("没有蓝牙设备");
+                else {
+                    //Connect button pressed, open DeviceListActivity class, with popup windows that scan for devices
+                    Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+                    startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
                 }
                 break;
             default:
@@ -179,5 +199,29 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 break;
         }
     }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_SELECT_DEVICE:
+                //When the DeviceListActivity return, with the selected device address
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    String deviceAddress = data.getStringExtra(BluetoothDevice.EXTRA_DEVICE);
+                    mBluetoothDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
+                    System.out.println(deviceAddress);
+                }
+                break;
+            case REQUEST_ENABLE_BT:
+                // When the request to enable Bluetooth returns
+                if (resultCode == Activity.RESULT_OK) {
+                    Toast.makeText(this, "Bluetooth has turned on ", Toast.LENGTH_SHORT).show();
 
+                } else {
+                    // User did not enable Bluetooth or an error occurred
+                    Toast.makeText(this, "Problem in BT Turning ON ", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
