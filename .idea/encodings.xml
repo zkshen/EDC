@@ -3,11 +3,11 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/Test/src/main/java/edc/test/BluetoothLeService.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Test/src/main/java/edc/test/DeviceListActivity.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/Test/src/main/java/edc/test/SampleGattAttributes.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/Test/src/main/java/edc/test/SampleGattAttributes.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Test/src/main/java/edc/test/SampleGattAttributes.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Test/src/main/java/edc/test/UartService.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/Test/src/main/res/layout/device_element.xml" charset="GBK" />
     <file url="file://$PROJECT_DIR$/Test/src/main/res/layout/device_list.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/Test/src/main/res/layout/equ_list.xml" charset="GBK" />
     <file url="file://$PROJECT_DIR$/Test/src/main/res/layout/title_bar.xml" charset="GBK" />
     <file url="PROJECT" charset="UTF-8" />
   </component>

@@ -58,6 +58,8 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
     public BluetoothLeService mBluetoothLeService = null;
     private boolean mConnected = false;
     private List<BluetoothGattService> BleServices;
+    private mListAdapter equlistAdapter;
+    private List<String> equList = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,13 +109,17 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
     private void setViewPager(){
         List<View> views;
         ContentAdapter adapter;
+        //equList =
+        equlistAdapter = new mListAdapter(this, equList);
         // 中间内容区域ViewPager
         this.viewPager = (ViewPager) findViewById(R.id.vp_content);
         // 适配器
         View page_1 = View.inflate(MainActivity.this, R.layout.page_1, null);
+
         View page_2 = View.inflate(MainActivity.this, R.layout.page_2, null);
-        //ListView device_list = (ListView) page_2.findViewById(R.id.device_list);
-        //device_list.setAdapter(deviceAdapter);
+        ListView device_list = (ListView) page_2.findViewById(R.id.device_list);
+        device_list.setAdapter(equlistAdapter);
+
         View page_3 = View.inflate(MainActivity.this, R.layout.page_3, null);
         views = new ArrayList<View>();
         views.add(page_1);
@@ -122,21 +128,26 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         adapter = new ContentAdapter(views);
         viewPager.setAdapter(adapter);
     }
-
+    // 在page_2中列出所有蓝牙设备，在mGattUpdateReceiver中调用
     private void ControlDisplay(){
-        String uuid = null;
+        String uuid;
+        String equname;
+        equList.clear();
         BleServices = mBluetoothLeService.getSupportedGattServices();
         for (BluetoothGattService gattService : BleServices) {
-            ArrayList<BluetoothGattCharacteristic> charas = new ArrayList<BluetoothGattCharacteristic>();
             List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
             // Loops through available Characteristics.
             for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                charas.add(gattCharacteristic);
                 HashMap<String, String> currentCharaData = new HashMap<String, String>();
                 uuid = gattCharacteristic.getUuid().toString();
+                equname = SampleGattAttributes.searchname(uuid);
                 System.out.println(uuid);
+                if(equname != null) {
+                    equList.add(equname);
+                }
             }
         }
+        equlistAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -175,6 +186,8 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 break;
             case R.id.disconnect:
                 mBluetoothLeService.disconnect();
+                equList.clear();
+                equlistAdapter.notifyDataSetChanged();
                 break;
             default:
                 break;
@@ -272,12 +285,12 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
-                ControlDisplay();
+
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
 
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-
+                ControlDisplay();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
 
             }
@@ -313,58 +326,47 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
 
-//    class mListAdapter extends BaseAdapter {
-//        Context context;
-//        ArrayList<BluetoothGattCharacteristic> charas;
-//        LayoutInflater inflater;
-//
-//        public mListAdapter(Context context, ArrayList<BluetoothGattCharacteristic> charas) {
-//            this.context = context;
-//            inflater = LayoutInflater.from(context);
-//            this.devices = devices;
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return devices.size();
-//        }
-//
-//        @Override
-//        public Object getItem(int position) {
-//            return devices.get(position);
-//        }
-//
-//        @Override
-//        public long getItemId(int position) {
-//            return position;
-//        }
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//            ViewGroup vg;
-//            System.out.println("test");
-//            if (convertView != null) {
-//                vg = (ViewGroup) convertView;
-//            } else {
-//                vg = (ViewGroup) inflater.inflate(R.layout.device_element, null);
-//            }
-//            BluetoothDevice device = devices.get(position);
-//            final TextView Address = ((TextView) vg.findViewById(R.id.DeviceAddress));
-//            final TextView Name = ((TextView) vg.findViewById(R.id.DeviceName));
-//            final TextView Rssi = (TextView) vg.findViewById(R.id.Rssi);
-//
-//            byte rssival = (byte) devRssiValues.get(device.getAddress()).intValue();
-//
-//            if(device.getName()==null) {
-//                Name.setText("Unknown Device");
-//            }
-//            else{
-//                Name.setText(device.getName());
-//            }
-//            Rssi.setText(String.valueOf(rssival));
-//            Address.setText(device.getAddress());
-//
-//            return vg;
-//        }
-//    }
+    class mListAdapter extends BaseAdapter {
+        Context context;
+        List<String> charas;
+        LayoutInflater inflater;
+
+        public mListAdapter(Context context, List<String> charas) {
+            this.context = context;
+            inflater = LayoutInflater.from(context);
+            this.charas = charas;
+        }
+
+        @Override
+        public int getCount() {
+            return charas.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return charas.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewGroup vg;
+            if (convertView != null) {
+                vg = (ViewGroup) convertView;
+            } else {
+                vg = (ViewGroup) inflater.inflate(R.layout.equ_list, null);
+            }
+            String chara = charas.get(position);
+
+            final TextView equName = ((TextView) vg.findViewById(R.id.EquName));
+
+            equName.setText(chara);
+
+            return vg;
+        }
+    }
 }
