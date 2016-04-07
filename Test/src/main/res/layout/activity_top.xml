@@ -12,7 +12,7 @@
         android:text="室内环境智能监控调节系统"
         android:layout_marginLeft="30dp"
         android:textSize="25dp"
-        android:textColor="#ffffff"
+        android:textColor="@color/white"
         android:id="@+id/textView4" />
 
     <ImageView

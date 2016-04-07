@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DeviceListActivity"/>
+        <service android:name=".BluetoothLeService" android:enabled="true"/>
     </application>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>

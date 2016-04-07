@@ -22,27 +22,18 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#666" >
+        android:layout_height="60dp"
+        android:background="@color/darkgrey" >
 
         <TextView
-            android:id="@+id/title_devices"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:paddingLeft="12dp"
-            android:paddingRight="50dp"
-            android:text="@string/select_device"
-            android:textColor="#fff"
-            android:textSize="15dip" />
+            android:text="Select a Device"
+            android:textSize="25dp"
+            android:textColor="@color/white"
+            android:id="@+id/textView4" />
 
-        <ImageView
-            android:id="@+id/about"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@android:drawable/ic_menu_info_details" />
     </RelativeLayout>
     <LinearLayout android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -65,6 +56,8 @@
             android:id="@+id/btn_cancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@android:string/cancel" />
+            android:background="@color/darkgrey"
+            android:text="@android:string/cancel"
+            android:textColor="@color/white"/>
     </LinearLayout>
 </LinearLayout>

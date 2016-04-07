@@ -1,27 +1,32 @@
 package edc.test;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,8 +46,8 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
     // 中间内容区域
     private ViewPager viewPager;
     // ViewPager适配器ContentAdapter
-    private ContentAdapter adapter;
-    private List<View> views;
+
+
 
     private ImageView ble_start;
 
@@ -50,6 +55,10 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
     private BluetoothDevice mBluetoothDevice = null;
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int REQUEST_SELECT_DEVICE = 1;
+    public BluetoothLeService mBluetoothLeService = null;
+    private boolean mConnected = false;
+    private List<BluetoothGattService> BleServices;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,14 +66,19 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         // 初始化控件
         initView();
         // 初始化底部按钮事件
+        setViewPager();
         initEvent();
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "找不到蓝牙适配器", Toast.LENGTH_SHORT).show();
         }
+        // 启动蓝牙服务
+        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
 
-    private void initEvent() {
+    void initEvent(){
         // 设置按钮监听
         ll_data.setOnClickListener(this);
         ll_control.setOnClickListener(this);
@@ -73,6 +87,7 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         viewPager.addOnPageChangeListener(this);
         ble_start.setOnClickListener(this);
     }
+
     private void initView() {
         // 底部菜单3个Linearlayout
         this.ll_data = (LinearLayout) findViewById(R.id.ll_data);
@@ -86,20 +101,44 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         this.tv_data = (TextView) findViewById(R.id.tv_data);
         this.tv_control = (TextView) findViewById(R.id.tv_control);
         this.tv_setting = (TextView) findViewById(R.id.tv_setting);
+        this.ble_start = (ImageView) findViewById(R.id.ble_start);
+    }
+
+    private void setViewPager(){
+        List<View> views;
+        ContentAdapter adapter;
         // 中间内容区域ViewPager
         this.viewPager = (ViewPager) findViewById(R.id.vp_content);
         // 适配器
         View page_1 = View.inflate(MainActivity.this, R.layout.page_1, null);
         View page_2 = View.inflate(MainActivity.this, R.layout.page_2, null);
+        //ListView device_list = (ListView) page_2.findViewById(R.id.device_list);
+        //device_list.setAdapter(deviceAdapter);
         View page_3 = View.inflate(MainActivity.this, R.layout.page_3, null);
         views = new ArrayList<View>();
         views.add(page_1);
         views.add(page_2);
         views.add(page_3);
-        this.adapter = new ContentAdapter(views);
+        adapter = new ContentAdapter(views);
         viewPager.setAdapter(adapter);
-        this.ble_start = (ImageView) findViewById(R.id.ble_start);
     }
+
+    private void ControlDisplay(){
+        String uuid = null;
+        BleServices = mBluetoothLeService.getSupportedGattServices();
+        for (BluetoothGattService gattService : BleServices) {
+            ArrayList<BluetoothGattCharacteristic> charas = new ArrayList<BluetoothGattCharacteristic>();
+            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
+            // Loops through available Characteristics.
+            for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+                charas.add(gattCharacteristic);
+                HashMap<String, String> currentCharaData = new HashMap<String, String>();
+                uuid = gattCharacteristic.getUuid().toString();
+                System.out.println(uuid);
+            }
+        }
+    }
+
     @Override
     public void onClick(View v) {
         // ImageView和TetxView置为绿色，页面随之跳转
@@ -123,26 +162,6 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 viewPager.setCurrentItem(2);
                 break;
             case R.id.ble_start:
-//                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-//                if(adapter != null){
-//                    Toast.makeText(this, "已找到蓝牙适配器", Toast.LENGTH_SHORT).show();
-//                    // 如果蓝牙未开启，则请求开启蓝牙
-//                    if(!adapter.isEnabled()){
-//                        Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//                        startActivity(intent);
-//                    }
-//                    Set<BluetoothDevice> devices = adapter.getBondedDevices();
-//                    if(devices.size() > 0){
-//                        for(Iterator iterator = devices.iterator();iterator
-//                                .hasNext();){
-//                            BluetoothDevice bluetoothDevice = (BluetoothDevice) iterator.next();
-//                            System.out.println(bluetoothDevice.getAddress());
-//                        }
-//                    }
-//                }
-//                else{
-//                    Toast.makeText(this, "找不到蓝牙适配器", Toast.LENGTH_SHORT).show();
-//                }
                 if (!mBluetoothAdapter.isEnabled()) {
                     System.out.println("蓝牙未开启");
                     Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -153,6 +172,9 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                     Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                     startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
                 }
+                break;
+            case R.id.disconnect:
+                mBluetoothLeService.disconnect();
                 break;
             default:
                 break;
@@ -199,6 +221,7 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 break;
         }
     }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_SELECT_DEVICE:
@@ -207,16 +230,17 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                     String deviceAddress = data.getStringExtra(BluetoothDevice.EXTRA_DEVICE);
                     mBluetoothDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
                     System.out.println(deviceAddress);
+                    mBluetoothLeService.connect(deviceAddress);
                 }
                 break;
             case REQUEST_ENABLE_BT:
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(this, "Bluetooth has turned on ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "已开启蓝牙", Toast.LENGTH_SHORT).show();
 
                 } else {
                     // User did not enable Bluetooth or an error occurred
-                    Toast.makeText(this, "Problem in BT Turning ON ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "未能开启蓝牙", Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 break;
@@ -224,4 +248,123 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 break;
         }
     }
+
+    // Code to manage Service lifecycle.
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+            if (!mBluetoothLeService.initialize()) {
+                System.out.println("无法初始化蓝牙设备");
+                finish();
+            }
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBluetoothLeService = null;
+        }
+    };
+
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+                mConnected = true;
+                ControlDisplay();
+            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                mConnected = false;
+
+            } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+
+            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
+
+            }
+        }
+    };
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        return intentFilter;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mGattUpdateReceiver);
+        unbindService(mServiceConnection);
+        mBluetoothLeService.stopSelf();
+        mBluetoothLeService = null;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+    }
+
+//    class mListAdapter extends BaseAdapter {
+//        Context context;
+//        ArrayList<BluetoothGattCharacteristic> charas;
+//        LayoutInflater inflater;
+//
+//        public mListAdapter(Context context, ArrayList<BluetoothGattCharacteristic> charas) {
+//            this.context = context;
+//            inflater = LayoutInflater.from(context);
+//            this.devices = devices;
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return devices.size();
+//        }
+//
+//        @Override
+//        public Object getItem(int position) {
+//            return devices.get(position);
+//        }
+//
+//        @Override
+//        public long getItemId(int position) {
+//            return position;
+//        }
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//            ViewGroup vg;
+//            System.out.println("test");
+//            if (convertView != null) {
+//                vg = (ViewGroup) convertView;
+//            } else {
+//                vg = (ViewGroup) inflater.inflate(R.layout.device_element, null);
+//            }
+//            BluetoothDevice device = devices.get(position);
+//            final TextView Address = ((TextView) vg.findViewById(R.id.DeviceAddress));
+//            final TextView Name = ((TextView) vg.findViewById(R.id.DeviceName));
+//            final TextView Rssi = (TextView) vg.findViewById(R.id.Rssi);
+//
+//            byte rssival = (byte) devRssiValues.get(device.getAddress()).intValue();
+//
+//            if(device.getName()==null) {
+//                Name.setText("Unknown Device");
+//            }
+//            else{
+//                Name.setText(device.getName());
+//            }
+//            Rssi.setText(String.valueOf(rssival));
+//            Address.setText(device.getAddress());
+//
+//            return vg;
+//        }
+//    }
 }

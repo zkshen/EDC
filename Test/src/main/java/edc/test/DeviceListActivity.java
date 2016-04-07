@@ -45,12 +45,11 @@ public class DeviceListActivity extends Activity {
 
     private BluetoothAdapter mBluetoothAdapter;
     private TextView mEmptyList;
-    //public static final String TAG = "DeviceListActivity";
     List<BluetoothDevice> deviceList;
     private DeviceAdapter deviceAdapter;
     private ServiceConnection onService = null;
     Map<String, Integer> devRssiValues;
-    private static final long SCAN_PERIOD = 10000; //10 seconds
+    private static final long SCAN_PERIOD = 5000; //扫描时间：5秒
     private Handler mHandler;
     private boolean mScanning = false;
 
@@ -250,33 +249,6 @@ public class DeviceListActivity extends Activity {
             Address.setText(device.getAddress());
 
             return vg;
-//            BluetoothDevice device = devices.get(position);
-//            RelativeLayout DeviceList;
-//            DeviceList = (RelativeLayout) findViewById(R.id.DeviceList);
-//            TextView Name;
-//            TextView Rssi;
-//            TextView Address;
-//            Name = (TextView) findViewById(R.id.DeviceName);
-//            Rssi = (TextView) findViewById(R.id.Rssi);
-//            Address = (TextView) findViewById(R.id.DeviceAddress);
-//            Name.setText(device.getName());
-//            byte rssival = (byte) devRssiValues.get(device.getAddress()).intValue();
-//            Rssi.setText(String.valueOf(rssival));
-//            Address.setText(device.getAddress());
-
-//            BluetoothDevice device = devices.get(position);
-//            byte rssival = (byte) devRssiValues.get(device.getAddress()).intValue();
-//            LinearLayout line = new LinearLayout (DeviceListActivity.this);
-//            TextView rssi = new TextView(DeviceListActivity.this);
-//            rssi.setText("rssi = " + String.valueOf(rssival));
-//            line.addView(rssi);
-//            TextView name = new TextView(DeviceListActivity.this);
-//            name.setText("name = " + device.getName());
-//            line.addView(name);
-//            TextView address = new TextView(DeviceListActivity.this);
-//            address.setText("address = " + device.getAddress());
-//            line.addView(address);
-//            return line;
         }
     }
     private void showMessage(String msg) {
