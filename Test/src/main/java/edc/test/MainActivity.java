@@ -59,7 +59,7 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
     private boolean mConnected = false;
     private List<BluetoothGattService> BleServices;
     private mListAdapter equlistAdapter;
-    private List<String> equList = new ArrayList<String>();
+    private List<String> DeviceList = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +110,7 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         List<View> views;
         ContentAdapter adapter;
         //equList =
-        equlistAdapter = new mListAdapter(this, equList);
+        equlistAdapter = new mListAdapter(this, DeviceList);
         // 中间内容区域ViewPager
         this.viewPager = (ViewPager) findViewById(R.id.vp_content);
         // 适配器
@@ -129,24 +129,9 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         viewPager.setAdapter(adapter);
     }
     // 在page_2中列出所有蓝牙设备，在mGattUpdateReceiver中调用
-    private void ControlDisplay(){
-        String uuid;
-        String equname;
-        equList.clear();
-        BleServices = mBluetoothLeService.getSupportedGattServices();
-        for (BluetoothGattService gattService : BleServices) {
-            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
-            // Loops through available Characteristics.
-            for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                HashMap<String, String> currentCharaData = new HashMap<String, String>();
-                uuid = gattCharacteristic.getUuid().toString();
-                equname = SampleGattAttributes.searchname(uuid);
-                System.out.println(uuid);
-                if(equname != null) {
-                    equList.add(equname);
-                }
-            }
-        }
+    private void DeviceDisplay(){
+        String devicename = mBluetoothDevice.getName();
+        DeviceList.add(devicename);
         equlistAdapter.notifyDataSetChanged();
     }
 
@@ -186,7 +171,7 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 break;
             case R.id.disconnect:
                 mBluetoothLeService.disconnect();
-                equList.clear();
+                DeviceList.clear();
                 equlistAdapter.notifyDataSetChanged();
                 break;
             default:
@@ -242,7 +227,6 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     String deviceAddress = data.getStringExtra(BluetoothDevice.EXTRA_DEVICE);
                     mBluetoothDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
-                    System.out.println(deviceAddress);
                     mBluetoothLeService.connect(deviceAddress);
                 }
                 break;
@@ -290,7 +274,7 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 mConnected = false;
 
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                ControlDisplay();
+                DeviceDisplay();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
 
             }
@@ -328,23 +312,23 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
 
     class mListAdapter extends BaseAdapter {
         Context context;
-        List<String> charas;
+        List<String> devices;
         LayoutInflater inflater;
 
-        public mListAdapter(Context context, List<String> charas) {
+        public mListAdapter(Context context, List<String> devices) {
             this.context = context;
             inflater = LayoutInflater.from(context);
-            this.charas = charas;
+            this.devices = devices;
         }
 
         @Override
         public int getCount() {
-            return charas.size();
+            return devices.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return charas.get(position);
+            return devices.get(position);
         }
 
         @Override
@@ -360,11 +344,11 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
             } else {
                 vg = (ViewGroup) inflater.inflate(R.layout.equ_list, null);
             }
-            String chara = charas.get(position);
+            String device = devices.get(position);
 
             final TextView equName = ((TextView) vg.findViewById(R.id.EquName));
 
-            equName.setText(chara);
+            equName.setText(device);
 
             return vg;
         }
