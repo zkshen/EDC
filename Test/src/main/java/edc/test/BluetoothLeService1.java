@@ -45,13 +45,11 @@ public class BluetoothLeService1 extends Service {
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
-    private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
-    private int mConnectionState = STATE_DISCONNECTED;
 
-    private static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    private static final int STATE_CONNECTED = 2;
+//    private static final int STATE_DISCONNECTED = 0;
+//    private static final int STATE_CONNECTING = 1;
+//    private static final int STATE_CONNECTED = 2;
 
     public final static String ACTION_GATT_CONNECTED =
             "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
@@ -79,7 +77,7 @@ public class BluetoothLeService1 extends Service {
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
-                mConnectionState = STATE_CONNECTED;
+                ConnectionState = true;
                 broadcastUpdate(intentAction);
                 Log.i(TAG, "Connected to GATT server.");
                 // Attempts to discover services after successful connection.
@@ -88,7 +86,7 @@ public class BluetoothLeService1 extends Service {
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
-                mConnectionState = STATE_DISCONNECTED;
+                ConnectionState = false;
                 Log.i(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
@@ -219,31 +217,13 @@ public class BluetoothLeService1 extends Service {
             Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;
         }
-        // Previously connected device.  Try to reconnect.
-        if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
-                && mBluetoothGatt != null) {
-            Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
-            if (mBluetoothGatt.connect()) {
-                mConnectionState = STATE_CONNECTING;
-                Toast.makeText(this, "蓝牙设备连接成功", Toast.LENGTH_SHORT).show();
-                ConnectionState = true;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
         final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         if (device == null) {
             Log.w(TAG, "Device not found.  Unable to connect.");
             return false;
         }
-        // We want to directly connect to the device, so we are setting the autoConnect
-        // parameter to false.
         mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
         Log.d(TAG, "Trying to create a new connection.");
-        mBluetoothDeviceAddress = address;
-        mConnectionState = STATE_CONNECTING;
         DeviceName = device.getName();
         ConnectionState = true;
         return true;
@@ -253,17 +233,7 @@ public class BluetoothLeService1 extends Service {
     public String getDeviceName(){
         return DeviceName;
     }
-
-    // 设置蓝牙设备位置
-    public void setDevicePosition(int position){
-        DevicePosition = position;
-    }
-
-    // 获取蓝牙设备位置
-    public int getDevicePosition(){
-        return DevicePosition;
-    }
-
+    // 获取蓝牙设备连接状态
     public boolean getConnectionState(){
         return ConnectionState;
     }
