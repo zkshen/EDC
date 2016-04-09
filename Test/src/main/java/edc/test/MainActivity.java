@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -52,13 +53,10 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
     private ImageView ble_start;
 
     private BluetoothAdapter mBluetoothAdapter = null;
-    private BluetoothDevice mBluetoothDevice = null;
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int REQUEST_SELECT_DEVICE = 1;
     public BluetoothLeService mBluetoothLeService = null;
-    private boolean mConnected = false;
-    private List<BluetoothGattService> BleServices;
-    private mListAdapter equlistAdapter;
+    private mListAdapter DeviceListAdapter;
     private List<String> DeviceList = new ArrayList<String>();
 
     @Override
@@ -110,7 +108,7 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         List<View> views;
         ContentAdapter adapter;
         //equList =
-        equlistAdapter = new mListAdapter(this, DeviceList);
+        DeviceListAdapter = new mListAdapter(this, DeviceList);
         // 中间内容区域ViewPager
         this.viewPager = (ViewPager) findViewById(R.id.vp_content);
         // 适配器
@@ -118,7 +116,8 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
 
         View page_2 = View.inflate(MainActivity.this, R.layout.page_2, null);
         ListView device_list = (ListView) page_2.findViewById(R.id.device_list);
-        device_list.setAdapter(equlistAdapter);
+        device_list.setAdapter(DeviceListAdapter);
+        device_list.setOnItemLongClickListener(mDeviceLongClickListener);
 
         View page_3 = View.inflate(MainActivity.this, R.layout.page_3, null);
         views = new ArrayList<View>();
@@ -129,11 +128,22 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         viewPager.setAdapter(adapter);
     }
     // 在page_2中列出所有蓝牙设备，在mGattUpdateReceiver中调用
-    private void DeviceDisplay(){
-        String devicename = mBluetoothDevice.getName();
+    private void DeviceDisplay() {
+        String devicename = mBluetoothLeService.getDeviceName();
         DeviceList.add(devicename);
-        equlistAdapter.notifyDataSetChanged();
+        DeviceListAdapter.notifyDataSetChanged();
     }
+
+    private AdapterView.OnItemLongClickListener mDeviceLongClickListener = new AdapterView.OnItemLongClickListener() {
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            mBluetoothLeService.disconnect();
+            DeviceList.clear();
+            DeviceListAdapter.notifyDataSetChanged();
+            return true;
+        }
+    };
 
     @Override
     public void onClick(View v) {
@@ -172,7 +182,7 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
             case R.id.disconnect:
                 mBluetoothLeService.disconnect();
                 DeviceList.clear();
-                equlistAdapter.notifyDataSetChanged();
+                DeviceListAdapter.notifyDataSetChanged();
                 break;
             default:
                 break;
@@ -226,7 +236,6 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 //When the DeviceListActivity return, with the selected device address
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     String deviceAddress = data.getStringExtra(BluetoothDevice.EXTRA_DEVICE);
-                    mBluetoothDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
                     mBluetoothLeService.connect(deviceAddress);
                 }
                 break;
@@ -268,10 +277,8 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                mConnected = true;
 
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                mConnected = false;
 
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 DeviceDisplay();

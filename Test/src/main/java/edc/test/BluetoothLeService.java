@@ -67,6 +67,9 @@ public class BluetoothLeService extends Service {
     public final static UUID UUID_HEART_RATE_MEASUREMENT =
             UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
 
+    private String DeviceName;
+    private int position;
+
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
@@ -239,7 +242,12 @@ public class BluetoothLeService extends Service {
         Log.d(TAG, "Trying to create a new connection.");
         mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
+        DeviceName = device.getName();
         return true;
+    }
+
+    public String getDeviceName(){
+        return DeviceName;
     }
 
     /**
