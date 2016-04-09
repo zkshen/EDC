@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package edc.test;
 
 import android.app.Service;
@@ -47,27 +31,10 @@ public class BluetoothLeService1 extends Service {
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothGatt mBluetoothGatt;
 
-//    private static final int STATE_DISCONNECTED = 0;
-//    private static final int STATE_CONNECTING = 1;
-//    private static final int STATE_CONNECTED = 2;
-
-    public final static String ACTION_GATT_CONNECTED =
-            "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
-    public final static String ACTION_GATT_DISCONNECTED =
-            "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
-    public final static String ACTION_GATT_SERVICES_DISCOVERED =
-            "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
-    public final static String ACTION_DATA_AVAILABLE =
-            "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
-    public final static String EXTRA_DATA =
-            "com.example.bluetooth.le.EXTRA_DATA";
-
-    public final static UUID UUID_HEART_RATE_MEASUREMENT =
-            UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
-
-    private String DeviceName;
-    private int DevicePosition;
-    private boolean ConnectionState = false;
+    public String DeviceName;
+    public int DevicePosition;
+    public boolean ConnectionState = false;
+    public String DeviceState;
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -76,7 +43,7 @@ public class BluetoothLeService1 extends Service {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                intentAction = ACTION_GATT_CONNECTED;
+                intentAction = PublicFunctions.ACTION_GATT_CONNECTED;
                 ConnectionState = true;
                 broadcastUpdate(intentAction);
                 Log.i(TAG, "Connected to GATT server.");
@@ -85,7 +52,7 @@ public class BluetoothLeService1 extends Service {
                         mBluetoothGatt.discoverServices());
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                intentAction = ACTION_GATT_DISCONNECTED;
+                intentAction = PublicFunctions.ACTION_GATT_DISCONNECTED;
                 ConnectionState = false;
                 Log.i(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
@@ -95,7 +62,7 @@ public class BluetoothLeService1 extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+                broadcastUpdate(PublicFunctions.ACTION_GATT_SERVICES_DISCOVERED);
             } else {
                 Log.w(TAG, "onServicesDiscovered received: " + status);
             }
@@ -106,14 +73,18 @@ public class BluetoothLeService1 extends Service {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+                byte[] value = characteristic.getValue();
+                DeviceState = PublicFunctions.displayData(value, (byte) value.length);
+                broadcastUpdate(PublicFunctions.ACTION_DATA_AVAILABLE, DeviceName, DeviceState);
             }
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+            byte[] value = characteristic.getValue();
+            DeviceState = PublicFunctions.displayData(value, (byte) value.length);
+            broadcastUpdate(PublicFunctions.ACTION_DATA_AVAILABLE, DeviceName, DeviceState);
         }
     };
 
@@ -122,36 +93,10 @@ public class BluetoothLeService1 extends Service {
         sendBroadcast(intent);
     }
 
-    private void broadcastUpdate(final String action,
-                                 final BluetoothGattCharacteristic characteristic) {
+    private void broadcastUpdate(final String action, final String devicename, final String devicestate) {
         final Intent intent = new Intent(action);
-
-        // This is special handling for the Heart Rate Measurement profile.  Data parsing is
-        // carried out as per profile specifications:
-        // http://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml
-        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
-            int flag = characteristic.getProperties();
-            int format = -1;
-            if ((flag & 0x01) != 0) {
-                format = BluetoothGattCharacteristic.FORMAT_UINT16;
-                Log.d(TAG, "Heart rate format UINT16.");
-            } else {
-                format = BluetoothGattCharacteristic.FORMAT_UINT8;
-                Log.d(TAG, "Heart rate format UINT8.");
-            }
-            final int heartRate = characteristic.getIntValue(format, 1);
-            Log.d(TAG, String.format("Received heart rate: %d", heartRate));
-            intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
-        } else {
-            // For all other profiles, writes the data formatted in HEX.
-            final byte[] data = characteristic.getValue();
-            if (data != null && data.length > 0) {
-                final StringBuilder stringBuilder = new StringBuilder(data.length);
-                for(byte byteChar : data)
-                    stringBuilder.append(String.format("%02X ", byteChar));
-                intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
-            }
-        }
+        intent.putExtra(PublicFunctions.DEVICE_NAME, devicename);
+        intent.putExtra(PublicFunctions.DEVICE_STATE, devicestate);
         sendBroadcast(intent);
     }
 
@@ -198,7 +143,6 @@ public class BluetoothLeService1 extends Service {
             Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
             return false;
         }
-
         return true;
     }
 
@@ -227,15 +171,6 @@ public class BluetoothLeService1 extends Service {
         DeviceName = device.getName();
         ConnectionState = true;
         return true;
-    }
-
-    // 获取蓝牙设备名称
-    public String getDeviceName(){
-        return DeviceName;
-    }
-    // 获取蓝牙设备连接状态
-    public boolean getConnectionState(){
-        return ConnectionState;
     }
 
     /**
@@ -294,14 +229,19 @@ public class BluetoothLeService1 extends Service {
             return;
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
+        BluetoothGattDescriptor descriptor = characteristic
+                .getDescriptor(UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+        if (descriptor == null)
+            return;
 
-        // This is specific to Heart Rate Measurement.
-        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                    UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+        if (enabled) {
+            Log.i(TAG, "enable notification");
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor);
+        } else {
+            Log.i(TAG, "disable notification");
+            descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
         }
+        mBluetoothGatt.writeDescriptor(descriptor);
     }
 
     /**
