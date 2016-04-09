@@ -73,12 +73,10 @@ public class BluetoothLeService0 extends Service {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                System.out.println("测试read");
                 byte[] value = characteristic.getValue();
                 DeviceState = PublicFunctions.displayData(value, (byte) value.length);
                 broadcastUpdate(PublicFunctions.ACTION_DATA_AVAILABLE, DeviceName, DeviceState);
             }
-            System.out.println("测试read");
         }
 
         @Override
@@ -215,7 +213,6 @@ public class BluetoothLeService0 extends Service {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
         }
-        System.out.println("测试read");
         mBluetoothGatt.readCharacteristic(characteristic);
     }
 

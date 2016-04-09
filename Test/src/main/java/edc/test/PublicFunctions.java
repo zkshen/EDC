@@ -18,7 +18,6 @@ public class PublicFunctions {
     public final static String ACTION_DATA_AVAILABLE = "ACTION_DATA_AVAILABLE";
     public final static String DEVICE_STATE = "DEVICE_STATE";
     public final static String DEVICE_NAME = "DEVICE_NAME";
-    public final static String EXTRA_DATA = "EXTRA_DATA";
 
     public static String displayData(byte[] value, byte len) {
         String txt = new String(value, 0, len - 1);

@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,6 +66,7 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
     private BluetoothGattCharacteristic SwitchChara1;
     private Handler mHandler;
     private static final long SCAN_PERIOD = 100;
+    private ListView device_list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,15 +114,14 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         DeviceListAdapter = new mListAdapter(this, DeviceList);
         // 中间内容区域ViewPager
         this.viewPager = (ViewPager) findViewById(R.id.vp_content);
-        // 适配器
         View page_1 = View.inflate(MainActivity.this, R.layout.page_1, null);
-
         View page_2 = View.inflate(MainActivity.this, R.layout.page_2, null);
-        ListView device_list = (ListView) page_2.findViewById(R.id.device_list);
+        device_list = (ListView) page_2.findViewById(R.id.device_list);
+        View page_3 = View.inflate(MainActivity.this, R.layout.page_3, null);
         device_list.setAdapter(DeviceListAdapter);
         device_list.setOnItemLongClickListener(mDeviceLongClickListener);
 
-        View page_3 = View.inflate(MainActivity.this, R.layout.page_3, null);
+
         views = new ArrayList<View>();
         views.add(page_1);
         views.add(page_2);
@@ -213,9 +214,6 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                     Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                     startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
                 }
-                break;
-            case R.id.disconnect:
-                DeviceDisplay();
                 break;
             default:
                 break;
@@ -355,8 +353,9 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                     mBluetoothLeService1.setCharacteristicNotification(SwitchChara1, true);     // 使能Notification
                 }
             } else if (PublicFunctions.ACTION_DATA_AVAILABLE.equals(action)) {
-                System.out.println(intent.getStringExtra(PublicFunctions.DEVICE_NAME));
-                System.out.println(intent.getStringExtra(PublicFunctions.DEVICE_STATE));
+                String name = intent.getStringExtra(PublicFunctions.DEVICE_NAME);
+                String state = intent.getStringExtra(PublicFunctions.DEVICE_STATE);
+                RefreshDevice(name, state);
             }
         }
     };
@@ -428,4 +427,47 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
         }
     }
 
+    private void RefreshDevice(String name, String state){
+        View view;
+        String text;
+        switch (device_list.getCount()){
+            case 1:
+                view = device_list.getChildAt(0);
+                text = ((TextView) view.findViewById(R.id.EquName)).getText().toString();
+                if(text.equals(name)){
+                    Switch aswitch = (Switch) view.findViewById(R.id.equ_switch);
+                    if(state.equals("00")){
+                        aswitch.setChecked(false);
+                    }else{
+                        aswitch.setChecked(true);
+                    }
+                }
+                break;
+            case 2:
+                view = device_list.getChildAt(0);
+                text = ((TextView) view.findViewById(R.id.EquName)).getText().toString();
+                if(text.equals(name)){
+                    Switch aswitch = (Switch) view.findViewById(R.id.equ_switch);
+                    if(state.equals("00")){
+                        aswitch.setChecked(false);
+                    }else{
+                        aswitch.setChecked(true);
+                    }
+                }else{
+                    view = device_list.getChildAt(1);
+                    text = ((TextView) view.findViewById(R.id.EquName)).getText().toString();
+                    if(text.equals(name)){
+                        Switch aswitch = (Switch) view.findViewById(R.id.equ_switch);
+                        if(state.equals("00")){
+                            aswitch.setChecked(false);
+                        }else{
+                            aswitch.setChecked(true);
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
