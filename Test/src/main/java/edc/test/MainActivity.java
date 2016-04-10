@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -418,12 +419,38 @@ public class MainActivity extends Activity implements OnClickListener,OnPageChan
                 vg = (ViewGroup) inflater.inflate(R.layout.equ_list, null);
             }
             String device = devices.get(position);
-
             final TextView equName = ((TextView) vg.findViewById(R.id.EquName));
-
             equName.setText(device);
-
+            final Switch aswitch = ((Switch) vg.findViewById(R.id.equ_switch));
+            MySwitchListener mSwitchListener = new MySwitchListener(device);
+            aswitch.setOnCheckedChangeListener(mSwitchListener);
             return vg;
+        }
+    }
+
+    //
+    private class MySwitchListener implements CompoundButton.OnCheckedChangeListener {
+        String thedevice;
+        byte on = 0x01;
+        byte off = 0x00;
+        public MySwitchListener(String device){
+            thedevice = device;
+        }
+        @Override
+        public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+            if(isChecked) {
+                if(thedevice.equals(mBluetoothLeService0.DeviceName)){
+                    mBluetoothLeService0.writeCharacteristic(SwitchChara0, on);
+                }else if(thedevice.equals(mBluetoothLeService1.DeviceName)){
+                    mBluetoothLeService1.writeCharacteristic(SwitchChara1, on);
+                }
+            }else {
+                if(thedevice.equals(mBluetoothLeService0.DeviceName)){
+                    mBluetoothLeService0.writeCharacteristic(SwitchChara0, off);
+                }else if(thedevice.equals(mBluetoothLeService1.DeviceName)){
+                    mBluetoothLeService1.writeCharacteristic(SwitchChara1, off);
+                }
+            }
         }
     }
 
