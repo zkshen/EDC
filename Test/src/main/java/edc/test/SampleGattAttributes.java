@@ -1,7 +1,11 @@
+
 package edc.test;
 
-
 import java.util.HashMap;
+
+/**
+ * BLE特征值集合
+ */
 
 public class SampleGattAttributes {
     private static HashMap<String, String> attributes = new HashMap();

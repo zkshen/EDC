@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DeviceListActivity"/>
+        <activity android:name=".SensorListActivity"/>
         <service android:name=".BluetoothLeService0" android:enabled="true"/>
         <service android:name=".BluetoothLeService1" android:enabled="true"/>
     </application>

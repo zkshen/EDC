@@ -8,9 +8,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="实时数据"
+        android:text="关闭"
         android:textSize="30dp"
-        android:id="@+id/textView" />
+        android:id="@+id/SensorState" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -19,9 +19,9 @@
         android:text="时间"
         android:id="@+id/textView2"
         android:layout_marginBottom="87dp"
-        android:layout_above="@+id/textView"
-        android:layout_toLeftOf="@+id/textView"
-        android:layout_toStartOf="@+id/textView" />
+        android:layout_above="@+id/SensorState"
+        android:layout_toLeftOf="@+id/SensorState"
+        android:layout_toStartOf="@+id/SensorState" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,7 +30,22 @@
         android:text="Large Text"
         android:id="@+id/textView3"
         android:layout_alignTop="@+id/textView2"
-        android:layout_alignRight="@+id/textView"
-        android:layout_alignEnd="@+id/textView" />
+        android:layout_alignRight="@+id/SensorState"
+        android:layout_alignEnd="@+id/SensorState" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="连接传感器"
+        android:id="@+id/Sensor"
+        android:layout_alignParentBottom="true"
+        android:layout_alignEnd="@+id/SensorState"
+        android:layout_marginBottom="91dp" />
+
+    <FrameLayout
+        android:id="@+id/sample_content_fragment"
+        android:layout_weight="2"
+        android:layout_width="match_parent"
+        android:layout_height="0px" />
 
 </RelativeLayout>

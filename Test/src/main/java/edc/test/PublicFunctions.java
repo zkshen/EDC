@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * Created by zkshen on 2016/4/9.
+ * 公共函数、常量
  */
 public class PublicFunctions {
 

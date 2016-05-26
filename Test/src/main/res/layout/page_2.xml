@@ -7,9 +7,18 @@
     <ListView
         android:id="@+id/device_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/SearchSwitch"
         android:layout_weight="2"
         android:stackFromBottom="false"
         android:scrollbars="vertical" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="搜 索 设 备"
+        android:id="@+id/SearchSwitch"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>
