@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edc.test;
+package edc.test.page1;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -35,6 +35,8 @@ import android.widget.TextView;
 import android.util.Log;
 
 import java.util.Set;
+
+import edc.test.R;
 
 /**
  * This Activity appears as a dialog. It lists any paired devices and

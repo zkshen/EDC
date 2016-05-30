@@ -1,4 +1,4 @@
-package edc.test;
+package edc.test.main;
 
 import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;

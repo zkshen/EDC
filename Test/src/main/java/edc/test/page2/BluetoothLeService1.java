@@ -1,4 +1,4 @@
-package edc.test;
+package edc.test.page2;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;

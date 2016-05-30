@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package edc.test;
+package edc.test.main;
+
+import edc.test.page1.BluetoothChatService;
 
 /**
  * Defines several constants used between {@link BluetoothChatService} and the UI.
@@ -31,5 +33,13 @@ public interface Constants {
     // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
+
+    public static final String OBJECT_ID = "objectId";
+    public static String CONVERSATION_ID = "conversation_id";
+
+    public static String MEMBER_ID = "member_id";
+
+    public static final String INSTALLATION = "installation";
+    public static final String MY_ACTION = "com.fdu.com.zju.callmemaybe.MY_ACTION";
 
 }

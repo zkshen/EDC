@@ -1,5 +1,5 @@
 
-package edc.test;
+package edc.test.page2;
 
 import java.util.HashMap;
 

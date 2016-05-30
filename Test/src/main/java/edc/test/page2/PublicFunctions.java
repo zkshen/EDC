@@ -1,4 +1,4 @@
-package edc.test;
+package edc.test.page2;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;

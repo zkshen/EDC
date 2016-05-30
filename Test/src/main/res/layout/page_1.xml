@@ -4,48 +4,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="关闭"
-        android:textSize="30dp"
-        android:id="@+id/SensorState" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="时间"
-        android:id="@+id/textView2"
-        android:layout_marginBottom="87dp"
-        android:layout_above="@+id/SensorState"
-        android:layout_toLeftOf="@+id/SensorState"
-        android:layout_toStartOf="@+id/SensorState" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/textView3"
-        android:layout_alignTop="@+id/textView2"
-        android:layout_alignRight="@+id/SensorState"
-        android:layout_alignEnd="@+id/SensorState" />
-
     <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="连 接 传 感 器"
+        android:textSize="20dp"
+        android:id="@+id/SearchSensor"
+        android:layout_alignParentBottom="true" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="16dp"
+        android:text="未连接"
+        android:id="@+id/states"
+        android:layout_above="@+id/SearchSensor"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="连接传感器"
-        android:id="@+id/Sensor"
-        android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/SensorState"
-        android:layout_marginBottom="91dp" />
+        android:textSize="28dp"
+        android:text="温度 :"
+        android:id="@+id/temperature"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="25dp" />
 
-    <FrameLayout
-        android:id="@+id/sample_content_fragment"
-        android:layout_weight="2"
-        android:layout_width="match_parent"
-        android:layout_height="0px" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="28dp"
+        android:text="湿度 :"
+        android:id="@+id/humidity"
+        android:layout_below="@id/temperature"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="25dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="28dp"
+        android:text="气压 :"
+        android:id="@+id/pressure"
+        android:layout_below="@id/humidity"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="25dp" />
 
 </RelativeLayout>

@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Login">
+    <LinearLayout
+        android:id="@+id/content_select"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+                <EditText
+                    android:layout_marginTop="150dp"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/userName"
+                    android:hint="账号" />
+
+                <EditText
+                    android:id="@+id/pwd"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    android:hint="密码"
+                    android:inputType="textPassword"/>
+                <Button
+                    android:id="@+id/btnLogin"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"
+                    android:text="登 录"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:onClick="login"
+                    android:elevation="4dp">
+                </Button>
+
+            </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,17 +1,30 @@
-package edc.test;
+package edc.test.main;
 
 import java.util.ArrayList;
+
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.SaveCallback;
+
+import edc.test.R;
+import edc.test.page1.SensorFragment;
+import edc.test.page2.ControlFragment;
+import edc.test.page3.SettingFragment;
 
 /**
  * 主Activity
@@ -170,5 +183,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,On
             default:
                 break;
         }
+    }
+
+    public static void goMainActivityFromActivity(Activity fromActivity) {
+        Intent intent = new Intent(fromActivity, MainActivity.class);
+        fromActivity.startActivity(intent);
     }
 }

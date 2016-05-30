@@ -1,4 +1,4 @@
-package edc.test;
+package edc.test.page2;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -27,6 +27,8 @@ import android.os.IBinder;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import edc.test.R;
 
 /**
  * Created by zkshen on 2016/5/26.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edc.test;
+package edc.test.page1;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -32,6 +32,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import edc.test.main.Constants;
+
 /**
  * This class does all the work for setting up and managing Bluetooth
  * connections with other devices. It has a thread that listens for
@@ -48,9 +50,9 @@ public class BluetoothChatService {
 
     // Unique UUID for this application
     private static final UUID MY_UUID_SECURE =
-            UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+            UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final UUID MY_UUID_INSECURE =
-            UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+            UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Member fields
     private final BluetoothAdapter mAdapter;
@@ -469,15 +471,21 @@ public class BluetoothChatService {
 
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[256];
             int bytes;
 
             // Keep listening to the InputStream while connected
-            while (mState == STATE_CONNECTED) {
+            while (true) {
                 try {
+                    // 接收58个字符后再发送给mHandler
+                    int count = mmInStream.available();
+                    while (count < 58)
+                    {
+                        count = mmInStream.available();
+                    }
+                    Log.i(TAG, "received");
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
-
                     // Send the obtained bytes to the UI Activity
                     mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();

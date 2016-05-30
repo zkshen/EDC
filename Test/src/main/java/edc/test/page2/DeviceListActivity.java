@@ -1,5 +1,5 @@
 
-package edc.test;
+package edc.test.page2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +16,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.ParcelUuid;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import edc.test.R;
 
 /**
  * 列出扫描到的BLE开关
@@ -174,7 +177,6 @@ public class DeviceListActivity extends Activity {
     	
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            BluetoothDevice device = deviceList.get(position);
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             Bundle b = new Bundle();
             b.putString(BluetoothDevice.EXTRA_DEVICE, deviceList.get(position).getAddress());
@@ -243,8 +245,5 @@ public class DeviceListActivity extends Activity {
 
             return vg;
         }
-    }
-    private void showMessage(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }
