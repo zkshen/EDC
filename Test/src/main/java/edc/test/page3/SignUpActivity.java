@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.SignUpCallback;
 import edc.test.R;
 
@@ -148,7 +149,6 @@ public class SignUpActivity extends Activity {
             MyUser.signUpByNameAndPwd(username.getText().toString(), pwd.getText().toString(), new SignUpCallback() {
                 public void done(AVException e) {
                     if (filterException(e)) {
-                        // successfully
                         Toast.makeText(SignUpActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
                         startActivity(intent);

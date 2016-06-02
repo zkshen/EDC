@@ -25,10 +25,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.os.IBinder;
 
+import com.avos.avoscloud.AVUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import edc.test.R;
+import edc.test.main.MainActivity;
 
 /**
  * Created by zkshen on 2016/5/26.
@@ -196,8 +199,12 @@ public class ControlFragment extends Fragment {
                     Switch aswitch = (Switch) view.findViewById(R.id.equ_switch);
                     if(state.equals("00")){
                         aswitch.setChecked(false);
+                        AVUser.getCurrentUser().put(name, "off");
+                        AVUser.getCurrentUser().saveInBackground();
                     }else{
                         aswitch.setChecked(true);
+                        AVUser.getCurrentUser().put(name, "on");
+                        AVUser.getCurrentUser().saveInBackground();
                     }
                 }
                 break;
@@ -208,8 +215,12 @@ public class ControlFragment extends Fragment {
                     Switch aswitch = (Switch) view.findViewById(R.id.equ_switch);
                     if(state.equals("00")){
                         aswitch.setChecked(false);
+                        AVUser.getCurrentUser().put(name, "off");
+                        AVUser.getCurrentUser().saveInBackground();
                     }else{
                         aswitch.setChecked(true);
+                        AVUser.getCurrentUser().put(name, "on");
+                        AVUser.getCurrentUser().saveInBackground();
                     }
                 }else{
                     view = device_list.getChildAt(1);
@@ -218,8 +229,12 @@ public class ControlFragment extends Fragment {
                         Switch aswitch = (Switch) view.findViewById(R.id.equ_switch);
                         if(state.equals("00")){
                             aswitch.setChecked(false);
+                            AVUser.getCurrentUser().put(name, "off");
+                            AVUser.getCurrentUser().saveInBackground();
                         }else{
                             aswitch.setChecked(true);
+                            AVUser.getCurrentUser().put(name, "on");
+                            AVUser.getCurrentUser().saveInBackground();
                         }
                     }
                 }
@@ -287,14 +302,22 @@ public class ControlFragment extends Fragment {
             if(isChecked) {
                 if(thedevice.equals(mBluetoothLeService0.DeviceName)){
                     mBluetoothLeService0.writeCharacteristic(SwitchChara0, on);
+                    AVUser.getCurrentUser().put(mBluetoothLeService0.DeviceName, "on");
+                    AVUser.getCurrentUser().saveInBackground();
                 }else if(thedevice.equals(mBluetoothLeService1.DeviceName)){
                     mBluetoothLeService1.writeCharacteristic(SwitchChara1, on);
+                    AVUser.getCurrentUser().put(mBluetoothLeService1.DeviceName, "on");
+                    AVUser.getCurrentUser().saveInBackground();
                 }
             }else {
                 if(thedevice.equals(mBluetoothLeService0.DeviceName)){
                     mBluetoothLeService0.writeCharacteristic(SwitchChara0, off);
+                    AVUser.getCurrentUser().put(mBluetoothLeService0.DeviceName, "off");
+                    AVUser.getCurrentUser().saveInBackground();
                 }else if(thedevice.equals(mBluetoothLeService1.DeviceName)){
                     mBluetoothLeService1.writeCharacteristic(SwitchChara1, off);
+                    AVUser.getCurrentUser().put(mBluetoothLeService1.DeviceName, "off");
+                    AVUser.getCurrentUser().saveInBackground();
                 }
             }
         }

@@ -20,6 +20,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVUser;
+
 import edc.test.R;
 import edc.test.main.Constants;
 
@@ -243,6 +246,12 @@ public class SensorFragment extends Fragment {
                     Humidity.setText("湿度 : " + strHumidity);
                     Temperature.setText("温度 : " + strTemperature);
                     Pressure.setText("气压 : " + strPressure);
+                    AVObject EnvLog = new AVObject("EnvLog");// 构建对象
+                    EnvLog.put("Humidity", strHumidity);
+                    EnvLog.put("Temperature", strTemperature);
+                    EnvLog.put("Pressure", strPressure);
+                    EnvLog.put("User", AVUser.getCurrentUser().getUsername());
+                    EnvLog.saveInBackground();// 保存到服务端
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name

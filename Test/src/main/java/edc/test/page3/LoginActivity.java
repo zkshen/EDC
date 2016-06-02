@@ -5,12 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVInstallation;
+import com.avos.avoscloud.AVUser;
 import com.avos.avoscloud.LogInCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.avos.avoscloud.im.v2.AVIMClient;
@@ -48,16 +48,12 @@ public class LoginActivity extends Activity {
         final String pwd = txtPwd.getText().toString().trim();
         MyUser.logInInBackground(username, pwd, new LogInCallback<MyUser>() {
             public void done(MyUser user, AVException e) {
-                if (user != null) {
-                    if (user.getInt("num") == 0) {
-                        // 登录成功
-                        updateUserInfo(user);
-                    } else {
-                        Toast.makeText(LoginActivity.this, "两次密码输入不同", Toast.LENGTH_SHORT).show();
-                    }
+                if (e == null && user != null) {
+                    updateUserInfo(user);
+                } else if (user == null) {
+                    Toast.makeText(LoginActivity.this, "用户名或密码错误", Toast.LENGTH_SHORT).show();
                 } else {
-                    // 登录失败
-                    Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "未知错误", Toast.LENGTH_SHORT).show();
                 }
             }
         }, MyUser.class);
@@ -77,12 +73,10 @@ public class LoginActivity extends Activity {
                             public void done(AVIMClient avimClient, AVIMException e) {
                                 if (filterException(e)) {
                                     Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                                    MainActivity.goMainActivityFromActivity(LoginActivity.this);
                                     finish();
                                 }
                             }
                         });
-
                     }
                 }
             });

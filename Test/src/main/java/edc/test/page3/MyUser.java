@@ -29,7 +29,6 @@ public class MyUser extends AVUser {
         AVUser user = new AVUser();
         user.setUsername(name);
         user.setPassword(password);
-        user.put("num", 0);
         user.signUpInBackground(callback);
     }
 
