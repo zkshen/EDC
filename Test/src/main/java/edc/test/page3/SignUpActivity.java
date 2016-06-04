@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.SaveCallback;
 import com.avos.avoscloud.SignUpCallback;
 import edc.test.R;
 
@@ -144,15 +146,37 @@ public class SignUpActivity extends Activity {
     /**
      * Called when the user_item clicks the RegCommit button
      */
+
     public void regCommit(View view) {
         if (username_checked == 1 && pwd_checked == 1 && pwd2_checked == 1) {
-            MyUser.signUpByNameAndPwd(username.getText().toString(), pwd.getText().toString(), new SignUpCallback() {
+            final AVObject UserLog = new AVObject("UserLog");// 构建对象
+            UserLog.put("User", username.getText().toString());
+            UserLog.saveInBackground(new SaveCallback() {
+                @Override
                 public void done(AVException e) {
-                    if (filterException(e)) {
+                    if (e == null) {
+                        String userid;
+                        userid = UserLog.getObjectId();
+                        MyUser.signUpByNameAndPwd(username.getText().toString() + "1", pwd.getText().toString(), userid, new SignUpCallback() {
+                            public void done(AVException e) {
+                                if (filterException(e)) {
+
+                                }
+                            }
+                        });
+                        MyUser.signUpByNameAndPwd(username.getText().toString() + "0", pwd.getText().toString(), userid, new SignUpCallback() {
+                            public void done(AVException e) {
+                                if (filterException(e)) {
+
+                                }
+                            }
+                        });
                         Toast.makeText(SignUpActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
+                    } else {
+                        // 失败的话，请检查网络环境以及 SDK 配置是否正确
                     }
                 }
             });

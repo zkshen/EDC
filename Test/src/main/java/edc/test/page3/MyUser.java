@@ -25,10 +25,13 @@ public class MyUser extends AVUser {
     }
 
 
-    public static void signUpByNameAndPwd(String name, String password, SignUpCallback callback) {
+    public static void signUpByNameAndPwd(String name, String password, String userid, SignUpCallback callback) {
         AVUser user = new AVUser();
+        String username = name.substring(0,name.length()-1);
         user.setUsername(name);
         user.setPassword(password);
+        user.put("UserID", userid);
+        user.put("User",username);
         user.signUpInBackground(callback);
     }
 

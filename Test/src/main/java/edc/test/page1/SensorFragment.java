@@ -22,9 +22,19 @@ import android.widget.Toast;
 
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVUser;
+import com.avos.avoscloud.im.v2.AVIMClient;
+import com.avos.avoscloud.im.v2.AVIMConversation;
+import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
+import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
+import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
+import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
+
+import java.util.Arrays;
 
 import edc.test.R;
 import edc.test.main.Constants;
+import edc.test.page3.MyClientManager;
 
 /**
  * Created by zkshen on 2016/5/26.
@@ -88,11 +98,48 @@ public class SensorFragment extends Fragment {
                     Intent serverIntent = new Intent(getActivity(), SensorListActivity.class);
                     startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
                     break;
+                // 发送消息
+                case R.id.MessageTest:
+                    sendMessage();
+                    break;
                 default:
                     break;
             }
         }
     };
+
+    public void sendMessage() {
+        // 与服务器连接
+        MyClientManager.getInstance().getClient().open(new AVIMClientCallback() {
+            @Override
+            public void done(AVIMClient client, AVIMException e) {
+                if (e == null) {
+                    // 创建与Jerry之间的对话
+                    client.createConversation(Arrays.asList("111"), "Update", null,
+                            new AVIMConversationCreatedCallback() {
+
+                                @Override
+                                public void done(AVIMConversation conversation, AVIMException e) {
+                                    if (e == null) {
+                                        AVIMTextMessage msg = new AVIMTextMessage();
+                                        msg.setText("耗子，起床！");
+                                        // 发送消息
+                                        conversation.sendMessage(msg, new AVIMConversationCallback() {
+
+                                            @Override
+                                            public void done(AVIMException e) {
+                                                if (e == null) {
+                                                    Log.d("Update", "发送成功！");
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                }
+            }
+        });
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -151,6 +198,8 @@ public class SensorFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         Button SearchSwitch = (Button) view.findViewById(R.id.SearchSensor);
         SearchSwitch.setOnClickListener(mClickListener1);
+        Button MessageTest = (Button) view.findViewById(R.id.MessageTest);
+        MessageTest.setOnClickListener(mClickListener1);
         State = (TextView) view.findViewById(R.id.states);
         Humidity = (TextView) view.findViewById(R.id.humidity);
         Temperature = (TextView) view.findViewById(R.id.temperature);

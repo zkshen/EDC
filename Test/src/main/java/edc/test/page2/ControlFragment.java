@@ -12,6 +12,7 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +26,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.os.IBinder;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.AVUser;
+import com.avos.avoscloud.GetCallback;
+import com.avos.avoscloud.im.v2.AVIMClient;
+import com.avos.avoscloud.im.v2.AVIMConversation;
+import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
+import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
+import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
+import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import edc.test.R;
 import edc.test.main.MainActivity;
+import edc.test.page3.MyClientManager;
 
 /**
  * Created by zkshen on 2016/5/26.
@@ -45,12 +59,14 @@ public class ControlFragment extends Fragment {
     private BluetoothGattCharacteristic SwitchChara0;
     private BluetoothGattCharacteristic SwitchChara1;
     private Handler mHandler;
-    private ListView device_list;
+    private static ListView device_list;
     private List<String> DeviceList = new ArrayList<String>();
     private mListAdapter DeviceListAdapter;
 
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int REQUEST_SELECT_DEVICE = 1;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -191,6 +207,7 @@ public class ControlFragment extends Fragment {
     private void RefreshDevice(String name, String state){
         View view;
         String text;
+        sendDevices();
         switch (device_list.getCount()){
             case 1:
                 view = device_list.getChildAt(0);
@@ -199,12 +216,10 @@ public class ControlFragment extends Fragment {
                     Switch aswitch = (Switch) view.findViewById(R.id.equ_switch);
                     if(state.equals("00")){
                         aswitch.setChecked(false);
-                        AVUser.getCurrentUser().put(name, "off");
-                        AVUser.getCurrentUser().saveInBackground();
+                        setState(name, "off");
                     }else{
                         aswitch.setChecked(true);
-                        AVUser.getCurrentUser().put(name, "on");
-                        AVUser.getCurrentUser().saveInBackground();
+                        setState(name, "on");
                     }
                 }
                 break;
@@ -215,26 +230,22 @@ public class ControlFragment extends Fragment {
                     Switch aswitch = (Switch) view.findViewById(R.id.equ_switch);
                     if(state.equals("00")){
                         aswitch.setChecked(false);
-                        AVUser.getCurrentUser().put(name, "off");
-                        AVUser.getCurrentUser().saveInBackground();
+                        setState(name, "off");
                     }else{
                         aswitch.setChecked(true);
-                        AVUser.getCurrentUser().put(name, "on");
-                        AVUser.getCurrentUser().saveInBackground();
+                        setState(name, "on");
                     }
-                }else{
+                } else{
                     view = device_list.getChildAt(1);
                     text = ((TextView) view.findViewById(R.id.EquName)).getText().toString();
                     if(text.equals(name)){
                         Switch aswitch = (Switch) view.findViewById(R.id.equ_switch);
                         if(state.equals("00")){
                             aswitch.setChecked(false);
-                            AVUser.getCurrentUser().put(name, "off");
-                            AVUser.getCurrentUser().saveInBackground();
-                        }else{
+                            setState(name, "off");
+                        }else {
                             aswitch.setChecked(true);
-                            AVUser.getCurrentUser().put(name, "on");
-                            AVUser.getCurrentUser().saveInBackground();
+                            setState(name, "on");
                         }
                     }
                 }
@@ -302,22 +313,18 @@ public class ControlFragment extends Fragment {
             if(isChecked) {
                 if(thedevice.equals(mBluetoothLeService0.DeviceName)){
                     mBluetoothLeService0.writeCharacteristic(SwitchChara0, on);
-                    AVUser.getCurrentUser().put(mBluetoothLeService0.DeviceName, "on");
-                    AVUser.getCurrentUser().saveInBackground();
+                    setState(mBluetoothLeService0.DeviceName, "on");
                 }else if(thedevice.equals(mBluetoothLeService1.DeviceName)){
                     mBluetoothLeService1.writeCharacteristic(SwitchChara1, on);
-                    AVUser.getCurrentUser().put(mBluetoothLeService1.DeviceName, "on");
-                    AVUser.getCurrentUser().saveInBackground();
+                    setState(mBluetoothLeService1.DeviceName, "on");
                 }
             }else {
                 if(thedevice.equals(mBluetoothLeService0.DeviceName)){
                     mBluetoothLeService0.writeCharacteristic(SwitchChara0, off);
-                    AVUser.getCurrentUser().put(mBluetoothLeService0.DeviceName, "off");
-                    AVUser.getCurrentUser().saveInBackground();
+                    setState(mBluetoothLeService0.DeviceName, "off");
                 }else if(thedevice.equals(mBluetoothLeService1.DeviceName)){
                     mBluetoothLeService1.writeCharacteristic(SwitchChara1, off);
-                    AVUser.getCurrentUser().put(mBluetoothLeService1.DeviceName, "off");
-                    AVUser.getCurrentUser().saveInBackground();
+                    setState(mBluetoothLeService1.DeviceName, "off");
                 }
             }
         }
@@ -375,6 +382,73 @@ public class ControlFragment extends Fragment {
             return true;
         }
     };
+
+    public void setState(String name, String state){
+        final String device = name;
+        final String dstate = state;
+        String userid = AVUser.getCurrentUser().getString("UserID");
+        //Log.i(test,userid);
+        AVQuery<AVObject> avQuery = new AVQuery<>("UserLog");
+        avQuery.getInBackground(userid, new GetCallback<AVObject>() {
+            @Override
+            public void done(AVObject avObject, AVException e) {
+                Log.i("test", avObject.getString("User"));
+                avObject.put(device, dstate);
+                avObject.saveInBackground();
+            }
+        });
+    }
+
+    public static void sendDevices() {
+        int i;
+        int c = device_list.getCount();
+        View view;
+        String device;
+        sendMessage(Integer.toString(c));
+        for(i=0; i<c; i++) {
+            view = device_list.getChildAt(i);
+            device = ((TextView) view.findViewById(R.id.EquName)).getText().toString();
+            sendMessage(device);
+        }
+        sendMessage("end");
+    }
+
+    public static void sendMessage(String message) {
+        final String msgsend = message;
+        // 与服务器连接
+        MyClientManager.getInstance().getClient().open(new AVIMClientCallback() {
+            @Override
+            public void done(AVIMClient client, AVIMException e) {
+                if (e == null) {
+                    // 创建与Jerry之间的对话
+                    client.createConversation(Arrays.asList(AVUser.getCurrentUser().getString("User")+1), "DeviceList", null,
+                            new AVIMConversationCreatedCallback() {
+                                @Override
+                                public void done(AVIMConversation conversation, AVIMException e) {
+                                    if (e == null) {
+                                        AVIMTextMessage msg = new AVIMTextMessage();
+                                        msg.setText(msgsend);
+                                        // 发送消息
+                                        conversation.sendMessage(msg, new AVIMConversationCallback() {
+
+                                            @Override
+                                            public void done(AVIMException e) {
+                                                if (e == null) {
+                                                    Log.d("Update", "发送成功！");
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                }
+            }
+        });
+    }
+
+    public void test(AVObject avObject) {
+        avObject.put("test","test");
+    }
 
     @Override
     public void onDestroy(){

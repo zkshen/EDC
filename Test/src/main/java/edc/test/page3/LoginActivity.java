@@ -46,7 +46,7 @@ public class LoginActivity extends Activity {
     public void login(View view) {
         final String username = txtUserName.getText().toString().trim();
         final String pwd = txtPwd.getText().toString().trim();
-        MyUser.logInInBackground(username, pwd, new LogInCallback<MyUser>() {
+        MyUser.logInInBackground(username+"0", pwd, new LogInCallback<MyUser>() {
             public void done(MyUser user, AVException e) {
                 if (e == null && user != null) {
                     updateUserInfo(user);
